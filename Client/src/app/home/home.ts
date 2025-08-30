@@ -1,8 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import { ChallengeCardComponent } from '../shared/components/challenge-card/challenge-card';
 import { Challenges } from '../services/challenges';
 import { ChallengeCard } from '../models/challenge';
 import { toast } from 'ngx-sonner';
+import { AuthService } from '../services/auth-service';
 
 @Component({
   selector: 'app-home',
@@ -11,14 +12,35 @@ import { toast } from 'ngx-sonner';
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
-  constructor(public challenges: Challenges) {}
+  constructor(public challenges: Challenges, public authService: AuthService) {}
 
   loadingChallenge = signal(false);
   loadingSubmit = signal(false);
 
   challenge = signal<ChallengeCard | undefined>(undefined);
 
-  ngOnInit() {
+  async ngOnInit() {
+    const accessToken = localStorage.getItem('ACCESS_TOKEN');
+
+    console.log('Access Token from storage:', accessToken);
+
+    if (!accessToken) {
+      toast.error('No access token found. Logging in with guest access.');
+      const loggingSuccessful = await this.authService.loginGuest();
+      if (loggingSuccessful) {
+        localStorage.setItem(
+          'ACCESS_TOKEN',
+          this.authService.authState().accessToken!
+        );
+      }
+    } else {
+      this.authService.authState.set({
+        isLoggedIn: true,
+        isGuest: true,
+        accessToken: accessToken,
+      });
+    }
+
     this.getDailyChallenge();
   }
 

@@ -37,7 +37,7 @@ public class JWTHandler(IConfiguration configuration)
             issuer: _configuration.GetValue<string>("JWTSecurity:Issuer"),
             audience: _configuration.GetValue<string>("JWTSecurity:Audience"),
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(10),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
         );
 

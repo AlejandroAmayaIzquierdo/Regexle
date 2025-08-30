@@ -8,7 +8,7 @@ namespace WebServer.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Authorize(Policy = "UserAccess")]
-public class ChallengeController(ChallengeService challengeService) : ControllerBase
+public class ChallengesController(ChallengeService challengeService) : ControllerBase
 {
     private readonly ChallengeService _challengeService = challengeService;
 

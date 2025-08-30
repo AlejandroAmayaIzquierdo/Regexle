@@ -14,7 +14,11 @@ export class Challenges {
   async getDailyChallenge(): Promise<ChallengeCard | undefined> {
     try {
       return await firstValueFrom(
-        this.http.get<ChallengeCard>(`${this.apiUrl}/today`)
+        this.http.get<ChallengeCard>(`${this.apiUrl}/today`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          },
+        })
       );
     } catch (Error) {
       console.error('Error fetching daily challenge:', Error);

@@ -121,27 +121,23 @@ public class AuthController(
         );
     }
 
-    [HttpPost("guess")]
+    [HttpPost("login/guest")]
     public async Task<IResult> Guess()
     {
         await Task.CompletedTask;
 
-        var result = await _authService.RegisterUserAsync(
-            new UserDto()
-            {
-                UserName = Guid.NewGuid().ToString(),
-                Email = $"{Guid.NewGuid()}@guess.com",
-                Password = "guess123",
-            }
-        );
+        var result = await _authService.RegisterUserAsync(Constants.GuessUser);
 
         if (result.IsFailure)
             return Results.Problem("Failed to register guess user", statusCode: 500);
 
-        var sessionResult = await _authService.GenerateSessionAndSaveRefreshTokenAsync(
-            result.Value!
-        );
+        var user = await _userService.GetUserByIdAsync(result.Value!.Id);
 
-        return Results.Ok(sessionResult);
+        if (user is null)
+            return Results.Problem("Failed to retrieve guess user", statusCode: 500);
+
+        var sessionResult = await _authService.GenerateSessionAndSaveRefreshTokenAsync(user);
+
+        return Results.Ok(new { accessToken = sessionResult.AccessToken });
     }
 }
