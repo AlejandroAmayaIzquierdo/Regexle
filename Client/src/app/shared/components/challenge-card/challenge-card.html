@@ -1,0 +1,37 @@
+<div class="bg-card rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-2 flex items-center gap-2">
+        🎯 Today's Challenge 
+        @if (!loading) {
+            <b>{{ challenge?.title }}</b>
+        }@else {
+            <lucide-icon [img]="LoadingIcon" class="animate-spin" />
+        }
+    </h2>
+
+    @if (!loading) {
+        <p class="text-lg text-muted-foreground mb-4">{{ challenge?.description }}</p>
+    }
+
+    <!-- Pattern display -->
+    <div class="bg-muted/50 p-6 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4">
+        <div class="flex flex-wrap gap-1 items-center justify-center min-h-[3rem] font-mono text-lg">
+            / {{ userInput }} /
+        </div>
+    </div>
+
+
+
+    <input type="text" [(ngModel)]="userInput" [disabled]="loading"
+        class="bg-background border border-muted-foreground rounded-lg p-3 w-full"
+        placeholder="Type your answer here..." />
+
+    <button (click)="userInputSubmit.emit(userInput)"
+        class="w-full bg-primary text-white mt-4 py-2 rounded-lg hover:bg-secondary flex items-center justify-center gap-2">
+        Test Pattern
+        @if (!loadingSubmit) {
+            <span class="ml-2">🚀</span>
+        } @else {
+            <lucide-icon [img]="LoadingIcon" class="animate-spin" />
+        }
+    </button>
+</div>
