@@ -1,0 +1,31 @@
+<div class="bg-card rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-2 flex items-center gap-2">
+        🧪 Test Cases
+    </h2>
+
+    <!-- @if (testCases?.length > 0) {
+        <div class="space-y-4 max-h-64 overflow-y-auto pr-2">
+            @for (let testCase of testCases) {
+                <div class="bg-muted/50 p-4 rounded-lg border border-muted-foreground/20">
+                    <p class="font-mono text-lg mb-2">Input: <b>{{ testCase.input }}</b></p>
+                    <p class="font-mono text-lg">Expected Output: <b>{{ testCase.expectedOutput }}</b></p>
+                </div>
+            }
+        </div>
+    } @else {
+        <p class="text-muted-foreground">No test cases available.</p>
+    } -->
+
+    @if (testCases.length > 0) {
+        <div class="space-y-4 max-h-64 overflow-y-auto pr-2">
+            @for (testCase of testCases; track testCase.id) {
+                <div class="bg-muted/50 p-4 rounded-lg border border-muted-foreground/20">
+                    <p class="font-mono text-lg mb-2">Input: <b>{{ testCase.text }}</b></p>
+                    <p class="font-mono text-lg">Status: <b>{{ testCase.status || 'Pending' }}</b></p>
+                </div>
+            }
+        </div>
+    } @else {
+        <p class="text-muted-foreground">No test cases available.</p>
+    }
+</div>

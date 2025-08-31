@@ -1,9 +1,10 @@
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { ChallengeCardComponent } from '../shared/components/challenge-card/challenge-card';
 import { Challenges } from '../services/challenges';
 import { ChallengeCard } from '../models/challenge';
 import { toast } from 'ngx-sonner';
 import { AuthService } from '../services/auth-service';
+import { SessionExpired } from '../shared/Errors';
 
 @Component({
   selector: 'app-home',
@@ -11,43 +12,38 @@ import { AuthService } from '../services/auth-service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
-  constructor(public challenges: Challenges, public authService: AuthService) {}
+export class Home {
+  constructor(public challenges: Challenges, public authService: AuthService) {
+    effect(() => {
+      if (this.authService.isAuthenticated) {
+        this.getDailyChallenge();
+      }
+    });
+  }
 
-  loadingChallenge = signal(false);
+  loadingChallenge = signal(true);
   loadingSubmit = signal(false);
 
   challenge = signal<ChallengeCard | undefined>(undefined);
 
-  async ngOnInit() {
-    const accessToken = localStorage.getItem('ACCESS_TOKEN');
-
-    console.log('Access Token from storage:', accessToken);
-
-    if (!accessToken) {
-      toast.error('No access token found. Logging in with guest access.');
-      const loggingSuccessful = await this.authService.loginGuest();
-      if (loggingSuccessful) {
-        localStorage.setItem(
-          'ACCESS_TOKEN',
-          this.authService.authState().accessToken!
-        );
-      }
-    } else {
-      this.authService.authState.set({
-        isLoggedIn: true,
-        isGuest: true,
-        accessToken: accessToken,
-      });
-    }
-
-    this.getDailyChallenge();
-  }
-
   public async getDailyChallenge() {
     this.loadingChallenge.set(true);
-    const challenge = await this.challenges.getDailyChallenge();
-    this.challenge.set(challenge);
+    const result = await this.challenges.getDailyChallenge();
+    if (result.success) {
+      this.challenge.set(result.data);
+    } else {
+      const error = result.error.code;
+
+      switch (error) {
+        case SessionExpired.code:
+          toast.error('Your session has expired. Please log in.');
+          this.authService.setUnauthorized();
+          break;
+        default:
+          toast.error('Failed to load challenge');
+          break;
+      }
+    }
     this.loadingChallenge.set(false);
   }
 
@@ -55,10 +51,22 @@ export class Home implements OnInit {
     this.loadingSubmit.set(true);
     const result = await this.challenges.submitUserInput(input);
 
-    if (result) {
+    console.log(result);
+
+    if (result.success) {
       toast.success('Input submitted successfully!');
     } else {
-      toast.error('Failed to submit input.');
+      const error = result.error.code;
+
+      switch (error) {
+        case SessionExpired.code:
+          toast.error('Your session has expired. Please log in.');
+          this.authService.setUnauthorized();
+          break;
+        default:
+          toast.error('Failed to submit input.');
+          break;
+      }
     }
     this.loadingSubmit.set(false);
   }

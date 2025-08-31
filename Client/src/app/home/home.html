@@ -1,5 +1,4 @@
 
-@if (authService.isAuthenticated) {
     <challenge-card
     [challenge]="challenge()"
     [loading]="loadingChallenge()"
@@ -7,7 +6,4 @@
     
     (userInputSubmit)="submitUserInput($event)"
     ></challenge-card>
-}@else {
-    <p>Please log in to see your daily challenge.</p>
-}
 

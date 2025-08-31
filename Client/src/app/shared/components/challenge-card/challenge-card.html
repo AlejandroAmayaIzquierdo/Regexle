@@ -26,7 +26,8 @@
         placeholder="Type your answer here..." />
 
     <button (click)="userInputSubmit.emit(userInput)"
-        class="w-full bg-primary text-white mt-4 py-2 rounded-lg hover:bg-secondary flex items-center justify-center gap-2">
+        [disabled]="loading || loadingSubmit || !authService.isAuthenticated || !userInput.trim()"
+        class="w-full bg-primary text-white mt-4 py-2 rounded-lg hover:bg-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
         Test Pattern
         @if (!loadingSubmit) {
             <span class="ml-2">🚀</span>

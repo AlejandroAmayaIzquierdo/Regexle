@@ -1,8 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { ChallengeCard, SubmitAnswer } from '../models/challenge';
 import { firstValueFrom } from 'rxjs';
+import { fail, Result, succeed } from '../shared/Util/Result';
+import { AuthService } from './auth-service';
+import { SessionExpired } from '../shared/Errors';
 
 @Injectable({
   providedIn: 'root',
@@ -11,30 +14,45 @@ export class Challenges {
   private readonly apiUrl = `${environment.apiUrl}/challenges`;
   constructor(private http: HttpClient) {}
 
-  async getDailyChallenge(): Promise<ChallengeCard | undefined> {
+  async getDailyChallenge(): Promise<Result<ChallengeCard>> {
     try {
-      return await firstValueFrom(
+      const challenge = await firstValueFrom(
         this.http.get<ChallengeCard>(`${this.apiUrl}/today`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
           },
         })
       );
+      return succeed(challenge);
     } catch (Error) {
-      console.error('Error fetching daily challenge:', Error);
-      return undefined;
+      const error = Error as HttpErrorResponse;
+
+      if (error.status === 401) {
+        return fail(SessionExpired);
+      }
+      return fail({
+        code: '',
+        message: error.message || 'Error fetching daily challenge',
+      });
     }
   }
 
-  public async submitUserInput(input: string): Promise<boolean> {
+  public async submitUserInput(input: string): Promise<Result<boolean>> {
     try {
       const result = await firstValueFrom(
         this.http.post<SubmitAnswer>(`${this.apiUrl}/submit`, { answer: input })
       );
-      return result.isSuccess;
+      return succeed(result.isSuccess);
     } catch (Error) {
-      console.error('Error submitting user input:', Error);
-      return false;
+      const error = Error as HttpErrorResponse;
+
+      if (error.status === 401) {
+        return fail(SessionExpired);
+      }
+      return fail({
+        code: '',
+        message: 'Error submitting user input',
+      });
     }
   }
 }
