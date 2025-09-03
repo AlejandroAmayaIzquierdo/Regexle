@@ -19,9 +19,12 @@
     @if (testCases.length > 0) {
         <div class="space-y-4 max-h-64 overflow-y-auto pr-2">
             @for (testCase of testCases; track testCase.id) {
-                <div class="bg-muted/50 p-4 rounded-lg border border-muted-foreground/20">
-                    <p class="font-mono text-lg mb-2">Input: <b>{{ testCase.text }}</b></p>
-                    <p class="font-mono text-lg">Status: <b>{{ testCase.status || 'Pending' }}</b></p>
+                <div class="p-4 rounded-lg {{ getColorStatus(testCase) }} flex justify-between relative">
+                    <div class="absolute left-0 top-0 rounded-lg h-fit w-fit bg-blend-hue">
+                        <p class="text-white p-1 text-xs">{{ testCase.id }}</p>
+                    </div>
+                    <p class="font-mono text-lg">{{ testCase.text }}</p>
+                    <p class="font-mono text-lg"><b>{{ testCase.status || 'Pending' }}</b></p>
                 </div>
             }
         </div>

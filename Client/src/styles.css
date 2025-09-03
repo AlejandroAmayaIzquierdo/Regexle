@@ -2,30 +2,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f1f5f9; /* slate-100 (gris claro de fondo general) */
   --foreground: #475569; /* slate-600 */
-  --card: #f1f5f9; /* slate-100 */
+
+  --card: #ffffff; /* blanco para tarjetas, modales, popovers */
   --card-foreground: #475569;
+
   --popover: #ffffff;
   --popover-foreground: #475569;
+
   --primary: #059669; /* emerald-600 */
   --primary-foreground: #ffffff;
+
   --secondary: #10b981; /* emerald-500 */
   --secondary-foreground: #ffffff;
-  --muted: #f1f5f9; /* slate-100 */
+
+  --muted: #e2e8f0; /* slate-200 */
   --muted-foreground: #475569;
+
   --accent: #10b981;
   --accent-foreground: #ffffff;
+
   --destructive: #ec4899; /* pink-500 */
   --destructive-foreground: #ffffff;
-  --border: #475569;
-  --input: #f1f5f9;
+
+  --border: #cbd5e1; /* slate-300, más suave que el gris oscuro */
+  --input: #ffffff; /* inputs blancos */
   --ring: #10b981;
+
   --chart-1: #059669;
   --chart-2: #10b981;
   --chart-3: #d97706; /* amber-600 */
   --chart-4: #ec4899;
   --chart-5: #be123c; /* rose-800 */
+
   --radius: 0.5rem;
 }
 

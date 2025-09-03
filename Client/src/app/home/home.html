@@ -1,9 +1,10 @@
 
+<div class="flex gap-5 flex-col w-full">
     <challenge-card
     [challenge]="challenge()"
     [loading]="loadingChallenge()"
     [loadingSubmit]="loadingSubmit()"
-    
-    (userInputSubmit)="submitUserInput($event)"
-    ></challenge-card>
+    (userInputSubmit)="submitUserInput($event)"/>
+    <test-cases [testCases]="challenge()?.testCases ?? []"/>
+</div>
 

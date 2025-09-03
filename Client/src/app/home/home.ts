@@ -5,10 +5,11 @@ import { ChallengeCard } from '../models/challenge';
 import { toast } from 'ngx-sonner';
 import { AuthService } from '../services/auth-service';
 import { SessionExpired } from '../shared/Errors';
+import { TestCases } from '../shared/components/test-cases/test-cases';
 
 @Component({
   selector: 'app-home',
-  imports: [ChallengeCardComponent],
+  imports: [ChallengeCardComponent, TestCases],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

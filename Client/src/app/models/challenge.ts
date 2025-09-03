@@ -15,5 +15,6 @@ export interface SubmitAnswer {
 export interface TestCase {
   id: string;
   text: string;
+  isMatch: boolean;
   status: 'pending' | 'success' | 'error';
 }
