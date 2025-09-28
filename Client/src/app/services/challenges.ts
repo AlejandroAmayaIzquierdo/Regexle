@@ -5,7 +5,12 @@ import { ChallengeCard, SubmitAnswer } from '../models/challenge';
 import { firstValueFrom } from 'rxjs';
 import { fail, Result, succeed } from '../shared/Util/Result';
 import { AuthService } from './auth-service';
-import { SessionExpired } from '../shared/Errors';
+import {
+  InvalidRegexPattern,
+  RegexDoesNotPassAllTestCases,
+  SessionExpired,
+} from '../shared/Errors';
+import { ProblemError } from '../models/Api';
 
 @Injectable({
   providedIn: 'root',
@@ -27,9 +32,8 @@ export class Challenges {
     } catch (Error) {
       const error = Error as HttpErrorResponse;
 
-      if (error.status === 401) {
-        return fail(SessionExpired);
-      }
+      if (error.status === 401) return fail(SessionExpired);
+
       return fail({
         code: '',
         message: error.message || 'Error fetching daily challenge',
@@ -40,15 +44,25 @@ export class Challenges {
   public async submitUserInput(input: string): Promise<Result<boolean>> {
     try {
       const result = await firstValueFrom(
-        this.http.post<SubmitAnswer>(`${this.apiUrl}/submit`, { answer: input })
+        this.http.post<SubmitAnswer>(
+          `${this.apiUrl}/submit`,
+          { answer: input },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+            },
+          }
+        )
       );
       return succeed(result.isSuccess);
     } catch (Error) {
       const error = Error as HttpErrorResponse;
 
-      if (error.status === 401) {
-        return fail(SessionExpired);
-      }
+      if (error.status === 401) return fail(SessionExpired);
+
+      if (error.status === 422) return fail(RegexDoesNotPassAllTestCases);
+
+      if (error.status === 400) return fail(InvalidRegexPattern);
       return fail({
         code: '',
         message: 'Error submitting user input',

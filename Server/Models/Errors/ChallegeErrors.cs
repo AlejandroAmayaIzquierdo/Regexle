@@ -1,6 +1,6 @@
 namespace WebServer.Models.Errors;
 
-public class ChallengeErrors
+public static class ChallengeErrors
 {
     public static readonly Error ChallengeNotFound = new(
         "Challenge.NotFound",
