@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebServer.DTOs.Challenges;
+using WebServer.Models.Challenges;
 using WebServer.Models.Errors;
 using WebServer.Services;
 
@@ -28,7 +29,10 @@ public class ChallengesController(ChallengeService challengeService) : Controlle
     public record SubmitRequest(string Answer);
 
     [HttpPost("submit")]
-    public async Task<IResult> SubmitChallenge(SubmitRequest request)
+    public async Task<IResult> SubmitChallenge(
+        SubmitRequest request,
+        [FromServices] UserContext userContext
+    )
     {
         if (Regex.Escape(request.Answer) == request.Answer)
             return Results.Problem("This is not a valid regex", statusCode: 400);
@@ -36,13 +40,20 @@ public class ChallengesController(ChallengeService challengeService) : Controlle
         var challenge = await _challengeService.GetTodayChallengeAsync();
         var result = await _challengeService.CheckRegex(request.Answer, challenge);
 
+        var user = await userContext.GetUser(true);
+
+        if (user is null)
+            return Results.Problem("User not found", statusCode: 404);
+
+        //new Attempt
+
         if (result.IsSuccess)
             return Results.Ok(
                 new SubmitResponseDto
                 {
                     IsSuccess = true,
                     Answer = request.Answer,
-                    AttemptsLeft = 3,
+                    AttemptsLeft = 0,
                 }
             );
 

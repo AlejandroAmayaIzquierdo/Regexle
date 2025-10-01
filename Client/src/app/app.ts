@@ -23,14 +23,18 @@ export class App implements OnInit {
 
     // si tiene token se lo asignas al servicio
     if (token) {
-      this.authService.setToken(token);
+      this.authService.setToken({ accessToken: token });
     } else if (!alreadyGuestGenerated) {
       // Primera vez → guest
       const ok = await this.authService.loginGuest();
-      if (ok) this.authService.setToken(this.authService.accessToken!, true);
+      if (ok)
+        this.authService.setToken(
+          { accessToken: this.authService.accessToken! },
+          true
+        );
     } else {
       // Ya fue guest → forzar login
-      this.authService.setToken(undefined);
+      this.authService.setToken({});
       toast.info('Please log in or register to continue');
       this.router.navigate(['/login']);
     }

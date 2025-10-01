@@ -17,4 +17,7 @@ public class User
     public string? ProfilePicLink { get; set; } = null;
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = [];
+
+    // Attempts
+    public UserAttempt[] Attempts { get; set; } = [];
 }

@@ -2,7 +2,7 @@ using WebServer.Models.Auth;
 
 namespace WebServer.Models.Challenges;
 
-public class Attempts
+public class Attempt
 {
     public int Id { get; set; }
     public int ChallengeId { get; set; }

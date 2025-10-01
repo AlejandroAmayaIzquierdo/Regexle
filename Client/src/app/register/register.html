@@ -1,7 +1,7 @@
 <div class="w-full h-full flex items-center justify-center bg-background absolute top-0 left-0">
     <div class="bg-card rounded-lg shadow p-6 w-full max-w-md">
-        <h2 class="text-2xl font-semibold mb-6 text-center">Login</h2>
-       <form class="space-y-4" (ngSubmit)="onSubmit($event)" >
+        <h2 class="text-2xl font-semibold mb-6 text-center">Register</h2>
+       <form class="space-y-4" >
         <div>
            <label for="username">Username:</label>
            <input [(ngModel)]="userName" type="text" id="username" name="username" required 
@@ -15,10 +15,10 @@
 
 
 
-           <button type="submit" class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-secondary transition-all">Login</button>
+           <button type="submit" class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-secondary transition-all">Register</button>
        </form>
        <p class="text-sm text-muted-foreground mt-4 block text-center cursor-default">
-            Don't have an account? <a routerLink="/register" class="text-primary hover:underline cursor-pointer">Register here</a>.
+            Already have an account? <a routerLink="/login" class="text-primary hover:underline cursor-pointer">Login here</a>.
        </p>
     </div>
 </div>

@@ -30,15 +30,21 @@ export class AuthService {
 
   async login(username: string, password: string): Promise<boolean> {
     try {
-      const a = await firstValueFrom(
+      const response = await firstValueFrom(
         this.http.post<{ accessToken: string; refreshToken: string }>(
-          '/login',
+          `${this.apiUrl}/login`,
           {
             username,
             password,
           }
         )
       );
+
+      this.authState.set({
+        isLoggedIn: true,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
 
       return true;
     } catch (error) {
@@ -72,18 +78,47 @@ export class AuthService {
     }
   }
 
+  async register(username: string, password: string): Promise<boolean> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ accessToken: string; refreshToken: string }>(
+          '/register',
+          {
+            username,
+            password,
+          }
+        )
+      );
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
+    return false;
+  }
+
   get accessToken() {
     return this.authState().accessToken;
   }
+  get refreshToken() {
+    return this.authState().refreshToken;
+  }
 
-  setToken(token: string | undefined, isGuest = false) {
-    if (token) {
-      localStorage.setItem('ACCESS_TOKEN', token);
+  setToken(
+    tokens: { accessToken?: string; refreshToken?: string },
+    isGuest?: boolean
+  ) {
+    if (tokens.accessToken) {
+      localStorage.setItem('ACCESS_TOKEN', tokens.accessToken);
       if (isGuest) localStorage.setItem('GUEST_GENERATED', 'true');
+    } else if (tokens.refreshToken) {
+      localStorage.setItem('ACCESS_TOKEN', tokens.refreshToken);
     } else {
       localStorage.removeItem('ACCESS_TOKEN');
     }
-    this.authState.set({ isLoggedIn: !!token, accessToken: token });
+    this.authState.set({
+      isLoggedIn: !!tokens.accessToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    });
   }
 
   setUnauthorized() {

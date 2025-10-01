@@ -18,4 +18,11 @@ export const routes: Routes = [
       return m.Login;
     },
   },
+  {
+    path: 'register',
+    loadComponent: async () => {
+      const m = await import('./register/register');
+      return m.Register;
+    },
+  },
 ];

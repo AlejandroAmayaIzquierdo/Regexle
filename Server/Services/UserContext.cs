@@ -46,7 +46,15 @@ public class UserContext(IHttpContextAccessor httpContextAccessor, IServiceProvi
         {
             using var scope = _serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            return await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
+
+            return await dbContext
+                .Users.Include(u =>
+                    u.Attempts.Where(a => a.AttemptedAt >= today && a.AttemptedAt < tomorrow)
+                )
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         return new User { Id = userId, UserName = userNameClaim ?? string.Empty };
