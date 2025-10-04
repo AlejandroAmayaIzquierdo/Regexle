@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './home/auth.guard';
+// import { AuthGuard } from './home/auth.guard';
 
 export const routes: Routes = [
   {
@@ -9,7 +9,7 @@ export const routes: Routes = [
       const m = await import('./home/home');
       return m.Home;
     },
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
   },
   {
     path: 'login',
@@ -23,6 +23,13 @@ export const routes: Routes = [
     loadComponent: async () => {
       const m = await import('./register/register');
       return m.Register;
+    },
+  },
+  {
+    path: 'history',
+    loadComponent: async () => {
+      const m = await import('./history/history');
+      return m.History;
     },
   },
 ];

@@ -19,5 +19,6 @@ public class User
     public virtual ICollection<UserRole> UserRoles { get; set; } = [];
 
     // Attempts
+    [JsonIgnore]
     public UserAttempt[] Attempts { get; set; } = [];
 }

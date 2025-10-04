@@ -10,7 +10,6 @@ import {
   RegexDoesNotPassAllTestCases,
   SessionExpired,
 } from '../shared/Errors';
-import { ProblemError } from '../models/Api';
 
 @Injectable({
   providedIn: 'root',

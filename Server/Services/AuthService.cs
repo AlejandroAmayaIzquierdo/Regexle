@@ -70,7 +70,7 @@ public class AuthService(JWTHandler jwtHandler, ApplicationDbContext dbContext)
             .ThenInclude(ur => ur.Role)
             .ThenInclude(rp => rp.RolePermissions)
             .ThenInclude(p => p.Permission)
-            .FirstOrDefaultAsync(u => u.UserName.ToLower() == userDto.UserName.ToLower());
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == userDto.Email.ToLower());
 
         bool isCredentialsWrong = false;
 

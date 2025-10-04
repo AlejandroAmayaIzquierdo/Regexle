@@ -1,11 +1,16 @@
 <div class="w-full h-full flex items-center justify-center bg-background absolute top-0 left-0">
     <div class="bg-card rounded-lg shadow p-6 w-full max-w-md">
         <h2 class="text-2xl font-semibold mb-6 text-center">Register</h2>
-       <form class="space-y-4" >
+       <form class="space-y-4" (ngSubmit)="onSubmit($event)" >
         <div>
            <label for="username">Username:</label>
            <input [(ngModel)]="userName" type="text" id="username" name="username" required 
            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-foreground outline-none transition-all">
+        </div>
+         <div>
+             <label for="email">Email:</label>
+             <input [(ngModel)]="email" type="email" id="email" name="email" required 
+             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-foreground outline-none transition-all">
         </div>
         <div>
            <label for="password">Password:</label>

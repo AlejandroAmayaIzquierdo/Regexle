@@ -41,6 +41,11 @@ export class Home {
 
       switch (error) {
         case SessionExpired.code:
+          const success = await this.authService.regenerateToken();
+          if (success) {
+            this.getDailyChallenge();
+            return;
+          }
           toast.error('Your session has expired. Please log in.');
           this.authService.setUnauthorized();
           break;
@@ -64,6 +69,11 @@ export class Home {
 
       switch (error) {
         case SessionExpired.code:
+          const success = await this.authService.regenerateToken();
+          if (success) {
+            this.submitUserInput(input);
+            return;
+          }
           toast.error('Your session has expired. Please log in.');
           this.authService.setUnauthorized();
           break;

@@ -95,16 +95,16 @@ public class AuthController(
             new() { IpAddress = ipAddress, UserAgent = userAgent! }
         );
 
-        bool isValidDevice = await _deviceService.ValidateDevice(
-            deviceRequest,
-            req.ExpiredAccessToken
-        );
+        // bool isValidDevice = await _deviceService.ValidateDevice(
+        //     deviceRequest,
+        //     req.ExpiredAccessToken
+        // );
 
-        if (!isValidDevice)
-            return Results.Problem(
-                "Unauthorized device",
-                statusCode: StatusCodes.Status400BadRequest
-            );
+        // if (!isValidDevice)
+        //     return Results.Problem(
+        //         "Unauthorized device",
+        //         statusCode: StatusCodes.Status400BadRequest
+        //     );
 
         var user = await _userService.GetUserByIdAsync(req.UserId);
         var isTokenValid = await _authService.ValidateRefreshTokenAsync(req);

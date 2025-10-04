@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { AuthState } from '../models/Auth';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Router } from '@angular/router';
+import { MyClaims, ProblemError, User } from '../models/Api';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
@@ -28,13 +30,13 @@ export class AuthService {
     return this.authState().user;
   }
 
-  async login(username: string, password: string): Promise<boolean> {
+  async login(email: string, password: string): Promise<boolean> {
     try {
       const response = await firstValueFrom(
         this.http.post<{ accessToken: string; refreshToken: string }>(
           `${this.apiUrl}/login`,
           {
-            username,
+            email,
             password,
           }
         )
@@ -78,21 +80,68 @@ export class AuthService {
     }
   }
 
-  async register(username: string, password: string): Promise<boolean> {
+  async register(
+    email: string,
+    userName: string,
+    password: string
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const response = await firstValueFrom(
+        this.http.post<User>(`${this.apiUrl}/register`, {
+          email,
+          userName,
+          password,
+        })
+      );
+
+      if (!response) return { success: false, message: 'Registration failed' };
+
+      return { success: true, message: 'Registration successful' };
+    } catch (Error) {
+      const { error } = Error as HttpErrorResponse;
+      const problem = error as ProblemError;
+      return {
+        success: false,
+        message: problem.detail || 'Registration failed',
+      };
+    }
+  }
+
+  async regenerateToken(): Promise<boolean> {
+    try {
+      console.log('Regenerating token...');
+      console.log('Current refresh token:', this.refreshToken);
+      console.log('Current access token:', this.accessToken);
+      if (!this.refreshToken) return false;
+
+      const response = await firstValueFrom(
         this.http.post<{ accessToken: string; refreshToken: string }>(
-          '/register',
+          `${this.apiUrl}/refresh-token`,
           {
-            username,
-            password,
+            userID: this.authState().user?.id,
+            refreshToken: this.refreshToken,
+            expiredAccessToken: this.accessToken,
           }
         )
       );
-    } catch (error) {
-      console.error('Registration failed', error);
+
+      this.authState.set({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        isLoggedIn: true,
+      });
+
+      return true;
+    } catch (Error) {
+      return false;
     }
-    return false;
+  }
+
+  async logout() {
+    this.setUnauthorized();
+    localStorage.removeItem('ACCESS_TOKEN');
+    localStorage.removeItem('REFRESH_TOKEN');
+    this.router.navigate(['/login']);
   }
 
   get accessToken() {
@@ -109,15 +158,27 @@ export class AuthService {
     if (tokens.accessToken) {
       localStorage.setItem('ACCESS_TOKEN', tokens.accessToken);
       if (isGuest) localStorage.setItem('GUEST_GENERATED', 'true');
-    } else if (tokens.refreshToken) {
-      localStorage.setItem('ACCESS_TOKEN', tokens.refreshToken);
     } else {
       localStorage.removeItem('ACCESS_TOKEN');
+    }
+
+    if (tokens.refreshToken) {
+      localStorage.setItem('REFRESH_TOKEN', tokens.refreshToken);
+    } else {
+      localStorage.removeItem('REFRESH_TOKEN');
     }
     this.authState.set({
       isLoggedIn: !!tokens.accessToken,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+    });
+  }
+
+  setUser(user: User) {
+    const prev = this.authState();
+    this.authState.set({
+      ...prev,
+      user: user,
     });
   }
 
@@ -130,5 +191,9 @@ export class AuthService {
       user: undefined,
     });
     this.router.navigate(['/login']);
+  }
+
+  parseToken(token: string) {
+    return jwtDecode<MyClaims>(token);
   }
 }
